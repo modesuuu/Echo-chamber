@@ -1,0 +1,172 @@
+---
+const currentPath = Astro.url.pathname;
+---
+
+<section class="Navbar w-full top-0 lg:px-16 px-6 mt-6 z-[2] fixed">
+    <div class="flex items-center justify-between">
+        <!-- logo/name -->
+        <div class="flex items-center gap-20">
+            <h1 class="font-bold italic text-2xl w-16 leading-5 reveal-text"><a href="/">ECHO CHAMBER</a></h1>
+            <div class="hidden lg:block">
+                <div class="text-2xl flex gap-3.5 items-center reveal-text">
+                    <h1>Curious, aren't you? It's</h1>
+                    <span>//</span>
+                    <h1 id="clock">timer</h1>
+                </div>
+            </div>
+        </div>
+        <!-- heading -->
+        <h1 class="font-bold italic hidden lg:block text-2xl w-[117px] text-center leading-5 uppercase reveal-text">A Personal Playlist Showcase</h1>
+        
+        <!-- Navlink mobile-->
+        <button id="menu-button" class="reveal-text cursor-pointer lg:hidden"><i class='bx bx-menu text-2xl'></i></button>
+        <!-- navside -->
+        <div id="navside" class="pointer-events-none lg:hidden bg-black px-6 py-6 text-white -left-0 top-0 z-50 fixed w-screen h-screen" style="clip-path: inset(0 0 100% 0)">
+            <div class="flex items-center justify-end w-full cursor-pointer">
+                <i id="close-btn" class='bx bx-x text-white text-2xl'></i>
+            </div>
+            <div class="flex flex-col justify-center items-center w-full h-full text-6xl">
+                <div class="menu-item overflow-hidden">
+                    <div class="relative item">
+                        {currentPath === "/" && (
+                            <div class="w-full h-1.5 bg-red-600 left-0 right-0 top-1/2 -translate-y-1/2 absolute"></div>
+                        )}
+                        <a class="uppercase translate-y-16" href="/">home</a>
+                    </div>
+                </div>
+                <div class="menu-item relative overflow-hidden">
+                    <div class="relative item">
+                        {currentPath === "/About" && (
+                            <div class="w-full h-1.5 bg-red-600 left-0 right-0 top-1/2 -translate-y-1/2 absolute"></div>
+                        )}
+                        <a class="uppercase" href="/About">about</a>
+                    </div>
+                </div>
+                <div class="menu-item relative overflow-hidden">
+                    <div class="relative item">
+                        {currentPath === "/Playlist" && (
+                            <div class="w-full h-1.5 bg-red-600 left-0 right-0 top-1/2 -translate-y-1/2 absolute"></div>
+                        )}
+                        <a class="uppercase" href="/Playlist">playlist</a>
+                    </div>
+                </div>
+                <div class="menu-item relative overflow-hidden">
+                    <div class="relative item">
+                        {currentPath === "/Contact" && (
+                            <div class="w-full h-1.5 bg-red-600 left-0 right-0 top-1/2 -translate-y-1/2 absolute"></div>
+                        )}
+                        <a class="uppercase" href="/Contact">contact</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navlink deskop-->
+        <div class="hidden lg:block">
+            <div class="uppercase text-2xl flex items-center gap-16">
+                <a class=`reveal-text ${currentPath === '/' ? 'opacity-100' : 'opacity-50 transition-all hover:opacity-100'}` href="/">home</a>
+                <a class=`reveal-text ${currentPath === '/About' ? 'opacity-100' : 'opacity-50 transition-opacity hover:opacity-100'}` href="/About">about</a>
+                <a class=`reveal-text ${currentPath === '/Playlist' ? 'opacity-100' : 'opacity-50 transition-opacity hover:opacity-100'}` href="/Playlist">playlist</a>
+                <a class=`reveal-text ${currentPath === '/Contact' ? 'opacity-100' : 'opacity-50 transition-opacity hover:opacity-100'}` href="/Contact">contact</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- script -->
+<script>
+    import gsap from "gsap";
+    
+    // time
+    function updateClock() {
+      const clockEl = document.getElementById("clock");
+      const now = new Date();
+  
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+  
+      if (clockEl) {
+        clockEl.textContent = `${hours}.${minutes}`;
+      }
+    }
+  
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // reveal
+    if(!sessionStorage.getItem("nav-animated")){
+        gsap.fromTo(".reveal-text", {
+            y: -100,
+        },{
+            y: 0,
+            ease: "power2.out",
+            duration: 1,
+            stagger: 0.2,
+        });
+        sessionStorage.setItem("nav-animated", "true");
+    }
+
+    // navside
+    const menuBtn = document.getElementById("menu-button");
+    const navside = document.getElementById("navside");
+    const menuLinks = document.querySelectorAll(".item");
+    const closeBtn = document.getElementById("close-btn");
+
+    const openNav = () => {
+        if (navside) {
+            navside.style.display = 'block';
+            navside.style.pointerEvents = 'auto';
+        }
+
+        const tl = gsap.timeline();
+        gsap.set(menuLinks, {
+            y: 0,
+        })
+
+        tl.to(navside, {
+            clipPath: 'inset(0 0 0% 0)',
+            duration: 2,
+            ease: 'power3.out',
+        });
+
+        tl.from(menuLinks, {
+            y: 100,
+            stagger: 0.2,
+            duration: 1,
+            ease: 'power3.out',
+        }, "<+0.5");
+
+    };
+
+    // close
+    const closeNav = () => {
+        const tl = gsap.timeline();
+
+        tl.to(menuLinks, {
+            y: 100,
+            stagger: 0.2,
+            duration: 1,
+            ease: 'power3.in',
+        });
+
+        tl.to(navside, {
+        clipPath: 'inset(0 0 100% 0)', 
+        duration: 2,
+        ease: 'power3.out',
+        onComplete: () => {
+            if (navside) {
+                navside.style.display = 'none'; 
+                navside.style.pointerEvents = 'none';
+            }
+        },});
+    };
+
+    if (menuBtn) {
+        menuBtn.addEventListener("click", openNav);
+    }
+    if (closeBtn) {
+        closeBtn.addEventListener("click", closeNav);
+    }
+</script>
+  
+

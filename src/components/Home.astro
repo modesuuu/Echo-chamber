@@ -1,0 +1,281 @@
+---
+
+const artists = {
+    "travis scott":{
+        cover: "./travis/cover",
+        left: "./travis/1",
+        right: "./travis/2",
+    },
+    "carti":{
+        cover: "./carti/cover",
+        left: "./carti/1",
+        right: "./carti/2",
+    },
+    "the neighbourhood":{
+        cover: "./thenhbd/cover",
+        left: "./thenhbd/1",
+        right: "./thenhbd/2",
+    },
+    "tv girl":{
+        cover: "./tvgirl/cover",
+        left: "./tvgirl/1",
+        right: "./tvgirl/2",
+    },
+    "tame impala":{
+        cover: "./tame/cover",
+        left: "./tame/1",
+        right: "./tame/2",
+    },
+}
+---
+
+<section id="pin-section" class="lg:px-16 px-6 mt-24">
+  <div class="py-[10%]">
+    <div class="relative">
+      <div class="img-container ">
+         <!-- Img hero -->
+         <div class="mt-9 relative lg:h-[324px] h-[264px] flex items-center justify-center">
+             <!-- album -->
+             <div class="flex album lg:gap-[224px] gap-40 pt-11">
+                 <div id="left-wrapper" class="lg:w-[226px] w-[126px] album-img lg:h-[226px] h-[126px] overflow-hidden relative -rotate-[24deg]">  
+                 </div>
+                 <div id="right-wrapper" class="lg:w-[226px] w-[126px] album-img lg:h-[226px] h-[126px] overflow-hidden relative rotate-[24deg]">
+                 </div>
+             </div>
+             <!-- Cover -->
+             <div class="absolute cover lg:mt-0 lg:w-[336px] w-[226px] z-[1] lg:h-[324px] h-[224px] overflow-hidden bg-black">
+                 <div id="cover-wrapper" class="w-full h-full relative"></div>
+             </div>
+         </div>
+         <!-- Text -->
+         <div class="lg:mt-10 mt-[20%] w-screen relative left-1/2 -translate-x-1/2 overflow-hidden flex flex-col items-center gap-3.5">
+             <img src="./top.svg" alt="" srcset="">
+             <!-- title -->
+             <div id="titles" class="flex justify-start sm:overflow-x-auto sm:min-w-max w-full items-center">
+                 {Object.keys(artists).map((name)=>(
+                     <h1 class="titles relative ml-32 font-semibold whitespace-nowrap text-[64px] text-center leading-[54px] uppercase">{name}</h1>
+                 ))}
+             </div>
+             <img src="./bottom.svg" alt="" srcset="">
+         </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="h-[300vh]"></div>
+
+<!-- script -->
+<script >
+  import gsap from "gsap";
+  import { CustomEase } from "gsap/CustomEase";
+  gsap.registerPlugin(CustomEase) 
+
+  // animation-hero-section
+  window.addEventListener("DOMContentLoaded", () => {
+    const wrapper = document.querySelector("#titles");
+    if (!wrapper) return;
+
+    const artists = {
+      "travis scott": {
+        cover: "./travis/cover.svg",
+        left: "./travis/1.svg",
+        right: "./travis/2.svg",
+      },
+      "carti": {
+        cover: "./carti/cover.svg",
+        left: "./carti/1.svg",
+        right: "./carti/2.svg",
+      },
+      "the neighbourhood": {
+        cover: "./thenhbd/cover.svg",
+        left: "./thenhbd/1.svg",
+        right: "./thenhbd/2.svg",
+      },
+      "tv girl": {
+        cover: "./tvgirl/cover.svg",
+        left: "./tvgirl/1.svg",
+        right: "./tvgirl/2.svg",
+      },
+      "tame impala": {
+        cover: "./tame/cover.svg",
+        left: "./tame/1.svg",
+        right: "./tame/2.svg",
+      },
+    };
+
+    const preloadImages = () => {
+    Object.values(artists).forEach((artist) => {
+      [artist.cover, artist.left, artist.right].forEach((src) => {
+        const img = new Image();
+        img.src = src;
+      });
+    });
+  };
+
+    preloadImages(); 
+    const coverWrapper = document.getElementById("cover-wrapper");
+    const leftWrapper = document.getElementById("left-wrapper");
+    const rightWrapper = document.getElementById("right-wrapper");
+
+    const originalItems = Array.from(wrapper.querySelectorAll("h1"));
+    for (let i = 0; i < 100; i++) {
+      originalItems.forEach((item) => {
+        const clone = item.cloneNode(true);
+        wrapper.appendChild(clone);
+      });
+    }
+
+    const allItems = Array.from(wrapper.querySelectorAll("h1"));
+    const virtualLength = originalItems.length;
+    const originalIndex = originalItems.findIndex((el) =>
+      el.textContent?.toLowerCase().includes("the neighbourhood")
+    );
+    const totalItems = allItems.length;
+    const clonesPerOriginal = Math.floor(totalItems / virtualLength);
+    let index = originalIndex + virtualLength * Math.floor(clonesPerOriginal / 2);
+
+    let isScrolling = false;
+
+    const updateOpacity = () => {
+      allItems.forEach((el, i) => {
+        const isCenter = i === index;
+        gsap.to(el, {
+          opacity: isCenter ? 1 : 0.2,
+          duration: 1,
+          ease: "power2.out",
+        });
+      });
+    };
+
+    const imageElementCache = new Map<string, HTMLImageElement>();
+    let zCounter = 10;
+    let currentArtist = "";
+    
+    const updateImages = (name: string) => {
+    name = name.toLowerCase().trim();
+    if (!(name in artists) || name === currentArtist) return;
+
+    currentArtist = name;
+
+    const artist = artists[name as keyof typeof artists];
+
+    const showImage = (wrapper: HTMLElement | null, key: string, src: string) => {
+    if (!wrapper) return;
+
+    const allImgs = Array.from(wrapper.children);
+    let img = imageElementCache.get(key);
+
+    if (!img) {
+      img = document.createElement("img");
+      img.src = src;
+      img.className = "absolute w-full h-full object-cover";
+      img.style.clipPath = "inset(0 0 100% 0)";
+      img.style.opacity = "0";
+      wrapper.appendChild(img);
+      imageElementCache.set(key, img);
+    }
+
+    img.style.zIndex = `${++zCounter}`;
+    img.style.opacity = "1";
+
+    const prev = allImgs.find(el => el !== img && (el as HTMLElement).style.opacity !== "0");
+
+    gsap.fromTo(
+      img,
+      { clipPath: "inset(0 0 100% 0)" },
+      { clipPath: "inset(0 0 0% 0)", duration: 0.6, ease: "power2.out" }
+    );
+
+    if (prev) {
+      setTimeout(() => {
+        gsap.to(prev, {
+          opacity: 0,
+          duration: 0.6,
+          ease: "power2.out"
+        });
+      }, 300);    
+    }
+  };
+
+    showImage(coverWrapper, `cover-${name}`, artist.cover);
+    showImage(leftWrapper, `left-${name}`, artist.left);
+    showImage(rightWrapper, `right-${name}`, artist.right);
+  };
+
+    const scrollToIndex = (i: number) => {
+      const item = allItems[i];
+      const itemCenterX = item.offsetLeft + item.offsetWidth / 2;
+      const wrapperCenterX = (wrapper as HTMLElement).offsetWidth / 2;
+      const x = wrapperCenterX - itemCenterX;
+
+      const name = item.textContent?.toLowerCase().trim();
+      if (name) updateImages(name);
+
+      gsap.to(wrapper, {
+        x,
+        duration: 1,
+        ease: "power2.out",
+        force3D: true,
+        onUpdate: updateOpacity,
+        onComplete: () => {
+          isScrolling = false;
+        },
+      });
+    };
+
+    requestAnimationFrame(() => {
+      const target = allItems[index];
+      const itemCenter = target.offsetLeft + target.offsetWidth / 2;
+      const centerScreen = window.innerWidth / 2;
+      const x = centerScreen - itemCenter;
+      // const customEase = CustomEase.create("custom", "M0,0 C0.682,0 0,0.992 1,0.992 ")
+
+      gsap.set(wrapper, { x });
+
+      if(!sessionStorage.getItem("album-animated")){
+
+        // animasi rotate album
+        gsap.from("#left-wrapper", {
+          rotate: 0,
+          x: "150px",
+          duration: 1.2,
+          ease: "power2.out",
+          filter: "blur(4px)",
+        });
+    
+        gsap.from("#right-wrapper", {
+          rotate: 0,
+          x: "-150px",
+          duration: 1.2,
+          ease: "power2.out",
+          filter: "blur(4px)",
+        });
+
+        sessionStorage.setItem("album-animated", "true");
+      }
+
+      updateOpacity();
+
+      const name = target.textContent?.toLowerCase().trim();
+      if (name) updateImages(name);
+    });
+
+    window.addEventListener(
+      "wheel",
+      (e) => {
+        if (isScrolling) return;
+        isScrolling = true;
+
+        const direction = Math.sign(e.deltaY);
+        index += direction;
+
+        if (index >= allItems.length) index = 0;
+        if (index < 0) index = allItems.length - 1;
+
+        scrollToIndex(index);
+      },
+      { passive: false }
+    );
+  });
+
+</script>
