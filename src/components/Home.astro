@@ -43,26 +43,37 @@ const artists = {
                  </div>
              </div>
              <!-- Cover -->
-             <div class="absolute cover lg:mt-0 lg:w-[336px] w-[226px] z-[1] lg:h-[324px] h-[224px] overflow-hidden bg-black">
+             <div class="absolute cover lg:mt-0 lg:w-[336px] w-[236px] z-[1] lg:h-[324px] h-[224px] overflow-hidden bg-black">
                  <div id="cover-wrapper" class="w-full h-full relative"></div>
              </div>
          </div>
+         
          <!-- Text -->
-         <div class="lg:mt-10 mt-[20%] w-screen relative left-1/2 -translate-x-1/2 overflow-hidden flex flex-col items-center gap-3.5">
-             <img src="./top.svg" alt="" srcset="">
-             <!-- title -->
-             <div id="titles" class="flex justify-start sm:overflow-x-auto sm:min-w-max w-full items-center">
-                 {Object.keys(artists).map((name)=>(
-                     <h1 class="titles relative ml-32 font-semibold whitespace-nowrap text-[64px] text-center leading-[54px] uppercase">{name}</h1>
-                 ))}
-             </div>
-             <img src="./bottom.svg" alt="" srcset="">
+        <div class="lg:mt-10 mt-[20%] w-screen relative left-1/2 -translate-x-1/2 overflow-hidden flex flex-col items-center gap-5">
+          <div class="flex items-center justify-between w-full px-6 lg:hidden">
+            <h1 class="text-xs">© 2025 My Playlist. All vibes reserved.</h1>
+            <div class="flex items-center gap-6">
+              <h1 class="text-xs">Got a vibe to share?</h1>
+              <div class="flex items-center gap-3">
+                <a href="https://open.spotify.com/user/31dtcfq6w7ewobywxvlr7mhcupvu?si=ca004c3bef554cd7"><i class="bx bxl-spotify"></i></a>
+                <a href="https://id.pinterest.com/moodesign_/"><i class="bx bxl-pinterest"></i></a>
+                <a href="https://www.instagram.com/moodeesign"><i class="bx bxl-instagram-alt"></i></a>
+              </div>
+            </div>
+           </div>
+          <img src="./top.svg" alt="" class="min-h-[13px] min-w-[1516px] " srcset="">
+            <!-- title -->
+            <div id="titles" class="flex justify-start sm:overflow-x-auto sm:min-w-max w-full items-center">
+                {Object.keys(artists).map((name)=>(
+                   <h1 class="titles relative ml-32 font-semibold whitespace-nowrap text-[64px] text-center leading-[54px] uppercase">{name}</h1>
+               ))}
+            </div>
+          <img src="./bottom.svg" alt="" class="min-h-[13px] min-w-[1516px] " srcset="">
          </div>
       </div>
     </div>
   </div>
 </section>
-<div class="h-[300vh]"></div>
 
 <!-- script -->
 <script >
@@ -123,14 +134,12 @@ const artists = {
         const clone = item.cloneNode(true);
         wrapper.appendChild(clone);
         if (i === 99 && item === originalItems[originalItems.length - 1]) {
-  // Delay agar layout selesai
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      centerToIndex(index);
-    });
-  });
-}
-
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              centerToIndex(index);
+            });
+          });
+        }
       });
     }
 
@@ -142,7 +151,6 @@ const artists = {
     const totalItems = allItems.length;
     const clonesPerOriginal = Math.floor(totalItems / virtualLength);
     let index = originalIndex + virtualLength * Math.floor(clonesPerOriginal / 2);
-
     let isScrolling = false;
 
     const updateOpacity = () => {
@@ -209,9 +217,9 @@ const artists = {
     showImage(coverWrapper, `cover-${name}`, artist.cover);
     showImage(leftWrapper, `left-${name}`, artist.left);
     showImage(rightWrapper, `right-${name}`, artist.right);
-  };
+    };
 
-    const scrollToIndex = (i: number) => {
+      const scrollToIndex = (i: number) => {
       const item = allItems[i];
       const itemCenterX = item.offsetLeft + item.offsetWidth / 2;
       const wrapperCenterX = (wrapper as HTMLElement).offsetWidth / 2;
@@ -233,38 +241,39 @@ const artists = {
     };
 
     const centerToIndex = (i: any) => {
-  const target = allItems[i];
-  const itemCenter = target.offsetLeft + target.offsetWidth / 2;
-  const wrapperCenter = (wrapper as HTMLElement).offsetWidth / 2;
-  const x = wrapperCenter - itemCenter;
+      const target = allItems[i];
+      const itemCenter = target.offsetLeft + target.offsetWidth / 2;
+      const wrapperCenter = (wrapper as HTMLElement).offsetWidth / 2;
 
-  gsap.set(wrapper, { x });
+      const x = wrapperCenter - itemCenter;
 
-  if (!sessionStorage.getItem("album-animated")) {
-    gsap.from("#left-wrapper", {
-      rotate: 0,
-      x: "150px",
-      duration: 1.2,
-      ease: "power2.out",
-      filter: "blur(4px)",
-    });
+      gsap.set(wrapper, { x });
 
-    gsap.from("#right-wrapper", {
-      rotate: 0,
-      x: "-150px",
-      duration: 1.2,
-      ease: "power2.out",
-      filter: "blur(4px)",
-    });
+      if (!sessionStorage.getItem("album-animated")) {
+        gsap.from("#left-wrapper", {
+          rotate: 0,
+          x: "150px",
+          duration: 1.2,
+          ease: "power2.out",
+          filter: "blur(4px)",
+        });
 
-    sessionStorage.setItem("album-animated", "true");
-  }
+        gsap.from("#right-wrapper", {
+          rotate: 0,
+          x: "-150px",
+          duration: 1.2,
+          ease: "power2.out",
+          filter: "blur(4px)",
+        });
 
-  updateOpacity();
+        sessionStorage.setItem("album-animated", "true");
+      }
 
-  const name = target.textContent?.toLowerCase().trim();
-  if (name) updateImages(name);
-};
+      updateOpacity();
+
+      const name = target.textContent?.toLowerCase().trim();
+      if (name) updateImages(name);
+    };
 
     window.addEventListener(
       "wheel",
@@ -282,6 +291,28 @@ const artists = {
       },
       { passive: false }
     );
+
+    let touchStartX = 0;
+
+    wrapper.addEventListener("touchstart", (e) => {
+    touchStartX = (e as TouchEvent).touches[0].clientX;
+    touchStartX = (e as TouchEvent).touches[0].clientX;
+    });
+
+    wrapper.addEventListener("touchend", (e) => {
+      const touchEndX = (e as TouchEvent).changedTouches[0].clientX;
+      const deltaX = touchEndX - touchStartX;
+
+      if (Math.abs(deltaX) > 30 && !isScrolling) {
+        isScrolling = true;
+        index += deltaX < 0 ? 1 : -1;
+
+        if (index >= allItems.length) index = 0;
+        if (index < 0) index = allItems.length - 1;
+
+        scrollToIndex(index);
+      }
+    });
   });
 
 </script>

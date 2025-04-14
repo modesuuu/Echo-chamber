@@ -2,7 +2,6 @@
 @import "./font.css";
 *{
     font-family: 'Mango';
-    box-sizing: 0;
 }
 #titles {
   will-change: transform;
