@@ -122,6 +122,15 @@ const artists = {
       originalItems.forEach((item) => {
         const clone = item.cloneNode(true);
         wrapper.appendChild(clone);
+        if (i === 99 && item === originalItems[originalItems.length - 1]) {
+  // Delay agar layout selesai
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      centerToIndex(index);
+    });
+  });
+}
+
       });
     }
 
@@ -223,42 +232,39 @@ const artists = {
       });
     };
 
-    requestAnimationFrame(() => {
-      const target = allItems[index];
-      const itemCenter = target.offsetLeft + target.offsetWidth / 2;
-      const centerScreen = window.innerWidth / 2;
-      const x = centerScreen - itemCenter;
-      // const customEase = CustomEase.create("custom", "M0,0 C0.682,0 0,0.992 1,0.992 ")
+    const centerToIndex = (i: any) => {
+  const target = allItems[i];
+  const itemCenter = target.offsetLeft + target.offsetWidth / 2;
+  const wrapperCenter = (wrapper as HTMLElement).offsetWidth / 2;
+  const x = wrapperCenter - itemCenter;
 
-      gsap.set(wrapper, { x });
+  gsap.set(wrapper, { x });
 
-      if(!sessionStorage.getItem("album-animated")){
-
-        // animasi rotate album
-        gsap.from("#left-wrapper", {
-          rotate: 0,
-          x: "150px",
-          duration: 1.2,
-          ease: "power2.out",
-          filter: "blur(4px)",
-        });
-    
-        gsap.from("#right-wrapper", {
-          rotate: 0,
-          x: "-150px",
-          duration: 1.2,
-          ease: "power2.out",
-          filter: "blur(4px)",
-        });
-
-        sessionStorage.setItem("album-animated", "true");
-      }
-
-      updateOpacity();
-
-      const name = target.textContent?.toLowerCase().trim();
-      if (name) updateImages(name);
+  if (!sessionStorage.getItem("album-animated")) {
+    gsap.from("#left-wrapper", {
+      rotate: 0,
+      x: "150px",
+      duration: 1.2,
+      ease: "power2.out",
+      filter: "blur(4px)",
     });
+
+    gsap.from("#right-wrapper", {
+      rotate: 0,
+      x: "-150px",
+      duration: 1.2,
+      ease: "power2.out",
+      filter: "blur(4px)",
+    });
+
+    sessionStorage.setItem("album-animated", "true");
+  }
+
+  updateOpacity();
+
+  const name = target.textContent?.toLowerCase().trim();
+  if (name) updateImages(name);
+};
 
     window.addEventListener(
       "wheel",
